@@ -1,0 +1,13 @@
+ise-engine-hangul (1.0-1) unstable; urgency=low
+
+  * Add the debian build directory
+  * Git: 165.213.180.234:/git/slp/pkgs/ise-engine-hangul
+  * Tag: ise-engine-hangul_1.0-1
+  
+ -- Wei Ye <wei.ye@samsung.com>  Tue, 12 Nov 2010 16:00:08 +0900
+
+ise-engine-hangul (1.0) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Wei Ye <wei.ye@samsung.com>  Tue, 04 Nov 2010 12:00:08 +0900
