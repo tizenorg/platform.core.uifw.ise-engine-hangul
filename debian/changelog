@@ -1,3 +1,11 @@
+ise-engine-hangul (1.1-5) unstable; urgency=low
+
+  * Add the ise-engine-hangul-dbg package
+  * Git: 165.213.180.234:/git/slp/pkgs/ise-engine-hangul
+  * Tag: ise-engine-hangul_1.1-5
+  
+ -- Wei Ye <wei.ye@samsung.com>  Tue, 23 Nov 2010 16:00:08 +0900
+
 ise-engine-hangul (1.1-4) unstable; urgency=low
 
   * Add the libhangul-bin dependency

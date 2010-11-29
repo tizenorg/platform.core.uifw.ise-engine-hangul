@@ -10,3 +10,10 @@ Architecture: any
 Depends:
 Description: Hangul ISE for ISF
  <this module is IM engine of SCIM and built for ISF (ISF is input service framework for supporing mobile input and is extended from SCIM 1.4.7.>
+ 
+Package: ise-engine-hangul-dbg
+Section: debug
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: ise-engine-hangul (unstripped)
+ This package contains ise-engine-hangul unstripped files.
