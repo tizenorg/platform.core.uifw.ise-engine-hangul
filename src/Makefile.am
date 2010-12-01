@@ -55,7 +55,8 @@ hangul_imengine_setup_la_CFLAGS  = @SCIM_GTKUTILS_CFLAGS@ \
 
 hangul_imengine_setup_la_CXXFLAGS= @SCIM_GTKUTILS_CFLAGS@ \
 				   @SCIM_CFLAGS@ \
-				   $(hangul_DEFINES)
+				   $(hangul_DEFINES) \
+				   `pkg-config --cflags gtk+-2.0`
 
 hangul_imengine_setup_la_LDFLAGS = -avoid-version \
 				   -rpath $(setupmoduledir) \

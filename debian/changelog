@@ -1,3 +1,11 @@
+ise-engine-hangul (1.1-6) unstable; urgency=low
+
+  * Add the gtk header file path
+  * Git: 165.213.180.234:/git/slp/pkgs/ise-engine-hangul
+  * Tag: ise-engine-hangul_1.1-6
+  
+ -- Wei Ye <wei.ye@samsung.com>  Tue, 23 Nov 2010 16:00:08 +0900
+
 ise-engine-hangul (1.1-5) unstable; urgency=low
 
   * Add the ise-engine-hangul-dbg package
