@@ -1,8 +1,8 @@
-ise-engine-hangul (1.3.2-1) unstable; urgency=low
+ise-engine-hangul (1.3.2-2) unstable; urgency=low
 
   * Remove libhangul-bin in debian/control
-  * Git: 165.213.180.234:/git/slp/pkgs/ise-engine-hangul
-  * Tag: ise-engine-hangul_1.3.2-1
+  * Git: 165.213.180.234:slp/pkgs/i/ise-engine-hangul
+  * Tag: ise-engine-hangul_1.3.2-2
 
  -- Jihoon Kim <jihoon48.kim@samsung.com>  Tue, 23 Nov 2010 16:00:08 +0900
 
