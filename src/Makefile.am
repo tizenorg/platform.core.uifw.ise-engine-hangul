@@ -41,27 +41,27 @@ hangul_la_LDFLAGS	= -avoid-version \
 			  @LIBHANGUL_LIBS@
 
 if SCIM_BUILD_SETUP
-SETUP_MODULE = hangul-imengine-setup.la
+#SETUP_MODULE = hangul-imengine-setup.la
 endif
 
 setupmoduledir           = @SCIM_MODULEDIR@/SetupUI
 setupmodule_LTLIBRARIES  = $(SETUP_MODULE)
 
-hangul_imengine_setup_la_SOURCES = scim_hangul_imengine_setup.cpp
+#hangul_imengine_setup_la_SOURCES = scim_hangul_imengine_setup.cpp
 
-hangul_imengine_setup_la_CFLAGS  = @SCIM_GTKUTILS_CFLAGS@ \
-				   @SCIM_CFLAGS@ \
-				   $(hangul_DEFINES)
+#hangul_imengine_setup_la_CFLAGS  = @SCIM_GTKUTILS_CFLAGS@ \
+#				   @SCIM_CFLAGS@ \
+#				   $(hangul_DEFINES)
 
-hangul_imengine_setup_la_CXXFLAGS= @SCIM_GTKUTILS_CFLAGS@ \
-				   @SCIM_CFLAGS@ \
-				   $(hangul_DEFINES) \
-				   `pkg-config --cflags gtk+-2.0`
+#hangul_imengine_setup_la_CXXFLAGS= @SCIM_GTKUTILS_CFLAGS@ \
+#				   @SCIM_CFLAGS@ \
+#				   $(hangul_DEFINES) \
+#				   `pkg-config --cflags gtk+-2.0`
 
-hangul_imengine_setup_la_LDFLAGS = -avoid-version \
-				   -rpath $(setupmoduledir) \
-				   -module \
-				   @LIBTOOL_EXPORT_OPTIONS@ \
-				   @SCIM_GTKUTILS_LIBS@ \
-				   @INTLLIBS@ \
-				   @SCIM_LIBS@
+#hangul_imengine_setup_la_LDFLAGS = -avoid-version \
+#				   -rpath $(setupmoduledir) \
+#				   -module \
+#				   @LIBTOOL_EXPORT_OPTIONS@ \
+#				   @SCIM_GTKUTILS_LIBS@ \
+#				   @INTLLIBS@ \
+#				   @SCIM_LIBS@

@@ -1,3 +1,11 @@
+ise-engine-hangul (1.3.3-1) unstable; urgency=low
+
+  * Fix Makefile.am not to build GTK setup module.
+  * Git: 165.213.180.234:slp/pkgs/i/ise-engine-hangul
+  * Tag: ise-engine-hangul_1.3.3-1
+
+ -- Jihoon Kim <jihoon48.kim@samsung.com>  Thu, 01 Sep 2011 17:06:54 +0900
+
 ise-engine-hangul (1.3.2-3) unstable; urgency=low
 
   * Remove unused GTK dependency
