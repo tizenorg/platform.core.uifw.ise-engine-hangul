@@ -1,3 +1,4 @@
+#sbs-git:slp/pkgs/i/ise-engine-hangul ise-engine-hangul 1.3.3-1 6c7cdd3ee487a566bfe30d74a4527561e681e37e
 Name:       ise-engine-hangul
 Summary:    Hangul Input Method Engine for ISF
 Version:    1.3.2
