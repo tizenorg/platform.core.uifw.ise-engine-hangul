@@ -87,8 +87,6 @@ static ConfigPointer _scim_config (0);
 static Property hangul_mode(SCIM_PROP_HANGUL_MODE, "");
 static Property hanja_mode(SCIM_PROP_HANJA_MODE, "");
 
-static bool auto_reorder = true;
-
 extern "C" {
     void scim_module_init (void)
     {
@@ -134,6 +132,7 @@ HangulFactory::HangulFactory (const ConfigPointer &config)
     m_show_candidate_comment = true;
     m_use_ascii_mode = false;
     m_commit_by_word = false;
+    m_auto_reorder = true;
 
     m_hanja_table = hanja_table_load(NULL);
     m_symbol_table = NULL;
@@ -239,8 +238,8 @@ HangulFactory::reload_config(const ConfigPointer &config)
 				    false);
     m_hanja_mode = config->read(String(SCIM_CONFIG_HANJA_MODE),
 				    false);
-    auto_reorder = config->read(String(SCIM_CONFIG_AUTO_REORDER),
-				    auto_reorder);
+    m_auto_reorder = config->read(String(SCIM_CONFIG_AUTO_REORDER),
+                                    true);
 
     String str;
     str = config->read(String(SCIM_CONFIG_HANGUL_KEY),
@@ -266,27 +265,6 @@ HangulFactory::create_instance (const String &encoding, int id)
     return new HangulInstance (this, encoding, id);
 }
 
-static bool
-hangul_engine_on_transition (HangulInputContext     *hic,
-                             ucschar                 c,
-                             const ucschar          *preedit,
-                             void                   *data)
-{
-    if (!auto_reorder) {
-        if (hangul_is_choseong (c)) {
-            if (hangul_ic_has_jungseong (hic) || hangul_ic_has_jongseong (hic))
-                return false;
-        }
-
-        if (hangul_is_jungseong (c)) {
-            if (hangul_ic_has_jongseong (hic))
-                return false;
-        }
-    }
-
-    return true;
-}
-
 HangulInstance::HangulInstance (HangulFactory *factory,
                                 const String  &encoding,
                                 int            id)
@@ -296,7 +274,7 @@ HangulInstance::HangulInstance (HangulFactory *factory,
       m_output_mode (OUTPUT_MODE_SYLLABLE)
 {
     m_hic = hangul_ic_new(factory->m_keyboard_layout.c_str());
-    hangul_ic_connect_callback (m_hic, "transition", (void *)hangul_engine_on_transition, NULL);
+    hangul_ic_connect_callback (m_hic, "transition", (void *)on_transition, this);
 
     char label[16];
     std::vector <WideString> labels;
@@ -917,4 +895,27 @@ HangulInstance::register_all_properties()
     register_properties(proplist);
 }
 
-//vim: ts=4:nowrap:ai:expandtab:
+bool
+HangulInstance::on_transition (HangulInputContext     *hic,
+                               ucschar                 c,
+                               const ucschar          *preedit,
+                               void                   *data)
+{
+    HangulInstance *self = reinterpret_cast<HangulInstance*>(data);
+
+    if (!self->m_factory->m_auto_reorder) {
+        if (hangul_is_choseong (c)) {
+            if (hangul_ic_has_jungseong (hic) || hangul_ic_has_jongseong (hic))
+                return false;
+        }
+
+        if (hangul_is_jungseong (c)) {
+            if (hangul_ic_has_jongseong (hic))
+                return false;
+        }
+    }
+
+    return true;
+}
+
+// vim: sts=4 sw=4 nowrap ai expandtab

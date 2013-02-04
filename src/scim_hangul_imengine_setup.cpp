@@ -309,10 +309,10 @@ create_options_page(GtkTooltips *tooltips)
     gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
 #if GTK_CHECK_VERSION(2, 12, 0)
     gtk_widget_set_tooltip_text(button,
-            _("Whether to allow auto reorder between jungseong and choseong."));
+            _("Whether to reorder jamo automatically, if they are in wrong order."));
 #else
     gtk_tooltips_set_tip(tooltips, button,
-                          _("Whether to allow auto reorder between jungseong and choseong."), NULL);
+            _("Whether to reorder jamo automatically, if they are in wrong order."));
 #endif
     g_signal_connect(G_OBJECT(button), "toggled",
                      G_CALLBACK(on_default_toggle_button_toggled), NULL);
