@@ -147,7 +147,7 @@ HangulFactory::HangulFactory (const ConfigPointer &config)
 	    m_symbol_table = hanja_table_load(symbol_file.c_str());
     }
 
-    set_languages ("ko");
+    set_languages ("ko_KR");
 
     reload_config(m_config);
 
