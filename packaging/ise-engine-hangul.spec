@@ -1,10 +1,11 @@
 Name:       ise-engine-hangul
 Summary:    Hangul Input Method Engine for ISF
-Version:    0.3.2
-Release:    2
+Version:    0.4.0
+Release:    1
 Group:      System Environment/Libraries
 License:    GPL
 Source0:    %{name}-%{version}.tar.gz
+BuildRequires:  gettext-tools
 BuildRequires:  pkgconfig(isf)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(libhangul)
@@ -33,7 +34,7 @@ install -m0644 %{_builddir}/%{buildsubdir}/COPYING %{buildroot}%{_datadir}/licen
 
 %files
 %defattr(-,root,root,-)
-%{_datadir}/scim/icons/scim-hangul.png
+%{_datadir}/scim/icons/*
 %{_datadir}/scim/hangul/symbol.txt
 %{_datadir}/locale/*/LC_MESSAGES/*
 %{_libdir}/scim-1.0/1.4.0/IMEngine/hangul.so

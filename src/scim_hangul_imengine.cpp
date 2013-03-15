@@ -3,7 +3,7 @@
 
 /*
  * Smart Common Input Method
- * 
+ *
  * Copyright (C) 2004-2006 Choe Hwanjin
  * Copyright (c) 2004-2006 James Su <suzhe@tsinghua.org.cn>
  *
@@ -33,9 +33,10 @@
   #include <config.h>
 #endif
 
+#include <cstring>
+#include <unistd.h>
 #include <scim.h>
 #include "scim_hangul_imengine.h"
-#include <string.h>
 
 #ifdef HAVE_GETTEXT
   #include <libintl.h>
@@ -66,6 +67,7 @@
 #define SCIM_CONFIG_USE_ASCII_MODE              SCIM_CONFIG_PREFIX "/UseAsciiMode"
 #define SCIM_CONFIG_COMMIT_BY_WORD              SCIM_CONFIG_PREFIX "/CommitByWord"
 #define SCIM_CONFIG_HANJA_MODE                  SCIM_CONFIG_PREFIX "/HanjaMode"
+#define SCIM_CONFIG_AUTO_REORDER                SCIM_CONFIG_PREFIX "/AutoReorder"
 
 #define SCIM_CONFIG_PANEL_LOOKUP_TABLE_VERTICAL "/Panel/Gtk/LookupTableVertical"
 
@@ -73,30 +75,19 @@
 #define SCIM_PROP_HANGUL_MODE    SCIM_PROP_PREFIX "/HangulMode"
 #define SCIM_PROP_HANJA_MODE     SCIM_PROP_PREFIX "/HanjaMode"
 
-#define SCIM_PROP_LAYOUT         SCIM_PROP_PREFIX "/Layout"
-#define SCIM_PROP_LAYOUT_2       SCIM_PROP_LAYOUT "/2"
-#define SCIM_PROP_LAYOUT_32      SCIM_PROP_LAYOUT "/32"
-#define SCIM_PROP_LAYOUT_39      SCIM_PROP_LAYOUT "/39"
-#define SCIM_PROP_LAYOUT_3F      SCIM_PROP_LAYOUT "/3f"
-#define SCIM_PROP_LAYOUT_3S      SCIM_PROP_LAYOUT "/3s"
-#define SCIM_PROP_LAYOUT_3Y      SCIM_PROP_LAYOUT "/3y"
-
 #ifndef SCIM_HANGUL_ICON_FILE
     #define SCIM_HANGUL_ICON_FILE           (SCIM_ICONDIR "/scim-hangul.png")
 #endif
 
-static ConfigPointer _scim_config (0);
+#define SCIM_HANGUL_ICON_ON      SCIM_ICONDIR "/scim-hangul-on.png"
+#define SCIM_HANGUL_ICON_OFF     SCIM_ICONDIR "/scim-hangul-off.png"
 
-static Property keyboard_layout   (SCIM_PROP_LAYOUT,    "");
-static Property keyboard_layout_2 (SCIM_PROP_LAYOUT_2,  "");
-static Property keyboard_layout_32(SCIM_PROP_LAYOUT_32, "");
-static Property keyboard_layout_3f(SCIM_PROP_LAYOUT_3F, "");
-static Property keyboard_layout_39(SCIM_PROP_LAYOUT_39, "");
-static Property keyboard_layout_3s(SCIM_PROP_LAYOUT_3S, "");
-static Property keyboard_layout_3y(SCIM_PROP_LAYOUT_3Y, "");
+static ConfigPointer _scim_config (0);
 
 static Property hangul_mode(SCIM_PROP_HANGUL_MODE, "");
 static Property hanja_mode(SCIM_PROP_HANJA_MODE, "");
+
+static bool auto_reorder = true;
 
 extern "C" {
     void scim_module_init (void)
@@ -115,13 +106,6 @@ extern "C" {
         SCIM_DEBUG_IMENGINE(1) << "Initialize Hangul Engine\n";
 
         _scim_config = config;
-
-	keyboard_layout_2.set_label(_("2bul"));
-	keyboard_layout_32.set_label(_("3bul 2bul-shifted"));
-	keyboard_layout_3f.set_label(_("3bul Final"));
-	keyboard_layout_39.set_label(_("3bul 390"));
-	keyboard_layout_3s.set_label(_("3bul No-Shift"));
-	keyboard_layout_3y.set_label(_("3bul Yetgeul"));
 
         return 1;
     }
@@ -255,6 +239,8 @@ HangulFactory::reload_config(const ConfigPointer &config)
 				    false);
     m_hanja_mode = config->read(String(SCIM_CONFIG_HANJA_MODE),
 				    false);
+    auto_reorder = config->read(String(SCIM_CONFIG_AUTO_REORDER),
+				    auto_reorder);
 
     String str;
     str = config->read(String(SCIM_CONFIG_HANGUL_KEY),
@@ -280,6 +266,27 @@ HangulFactory::create_instance (const String &encoding, int id)
     return new HangulInstance (this, encoding, id);
 }
 
+static bool
+hangul_engine_on_transition (HangulInputContext     *hic,
+                             ucschar                 c,
+                             const ucschar          *preedit,
+                             void                   *data)
+{
+    if (!auto_reorder) {
+        if (hangul_is_choseong (c)) {
+            if (hangul_ic_has_jungseong (hic) || hangul_ic_has_jongseong (hic))
+                return false;
+        }
+
+        if (hangul_is_jungseong (c)) {
+            if (hangul_ic_has_jongseong (hic))
+                return false;
+        }
+    }
+
+    return true;
+}
+
 HangulInstance::HangulInstance (HangulFactory *factory,
                                 const String  &encoding,
                                 int            id)
@@ -289,6 +296,7 @@ HangulInstance::HangulInstance (HangulFactory *factory,
       m_output_mode (OUTPUT_MODE_SYLLABLE)
 {
     m_hic = hangul_ic_new(factory->m_keyboard_layout.c_str());
+    hangul_ic_connect_callback (m_hic, "transition", (void *)hangul_engine_on_transition, NULL);
 
     char label[16];
     std::vector <WideString> labels;
@@ -323,7 +331,6 @@ HangulInstance::candidate_key_event (const KeyEvent &key)
         case SCIM_KEY_space:
 	    if (is_hanja_mode())
 		return false;
-	    break;
         case SCIM_KEY_KP_Add:
 	    m_lookup_table.cursor_down ();
 	    update_lookup_table (m_lookup_table);
@@ -339,7 +346,6 @@ HangulInstance::candidate_key_event (const KeyEvent &key)
         case SCIM_KEY_h:
 	    if (is_hanja_mode())
 		return false;
-            break;
         case SCIM_KEY_Left:
 	    if (m_factory->m_lookup_table_vertical) {
 		lookup_table_page_up();
@@ -352,7 +358,6 @@ HangulInstance::candidate_key_event (const KeyEvent &key)
         case SCIM_KEY_l:
 	    if (is_hanja_mode())
 		return false;
-            break;
         case SCIM_KEY_Right:
 	    if (m_factory->m_lookup_table_vertical) {
 		lookup_table_page_down();
@@ -365,7 +370,6 @@ HangulInstance::candidate_key_event (const KeyEvent &key)
         case SCIM_KEY_k:
 	    if (is_hanja_mode())
 		return false;
-            break;
         case SCIM_KEY_Up:
 	    if (m_factory->m_lookup_table_vertical) {
 		m_lookup_table.cursor_up ();
@@ -378,7 +382,6 @@ HangulInstance::candidate_key_event (const KeyEvent &key)
         case SCIM_KEY_j:
 	    if (is_hanja_mode())
 		return false;
-            break;
         case SCIM_KEY_Down:
 	    if (m_factory->m_lookup_table_vertical) {
 		m_lookup_table.cursor_down ();
@@ -391,17 +394,15 @@ HangulInstance::candidate_key_event (const KeyEvent &key)
         case SCIM_KEY_Escape:
             delete_candidates ();
             break;
-        case SCIM_KEY_1: 
-        case SCIM_KEY_2: 
-        case SCIM_KEY_3: 
-        case SCIM_KEY_4: 
-        case SCIM_KEY_5: 
-        case SCIM_KEY_6: 
-        case SCIM_KEY_7: 
-        case SCIM_KEY_8: 
-        case SCIM_KEY_9: 
-	    if (is_hanja_mode())
-		return false;
+        case SCIM_KEY_1:
+        case SCIM_KEY_2:
+        case SCIM_KEY_3:
+        case SCIM_KEY_4:
+        case SCIM_KEY_5:
+        case SCIM_KEY_6:
+        case SCIM_KEY_7:
+        case SCIM_KEY_8:
+        case SCIM_KEY_9:
             select_candidate (key.code - SCIM_KEY_1);
             break;
         default:
@@ -582,7 +583,7 @@ HangulInstance::select_candidate (unsigned int index)
 	    m_surrounding_text.erase(0, candidate.length());
 	} else if (candidate.length() <= m_surrounding_text.length() + preedit.length()) {
 	    len = candidate.length() - m_surrounding_text.length();
-	    if (len > m_preedit.length()) {
+	    if (len > (int)m_preedit.length()) {
 		m_preedit.clear();
 		hangul_ic_reset(m_hic);
 	    } else {
@@ -687,6 +688,8 @@ HangulInstance::focus_in ()
 
     register_all_properties();
 
+    hangul_ic_select_keyboard(m_hic, m_factory->m_keyboard_layout.c_str());
+
     if (m_lookup_table.number_of_candidates ()) {
         update_lookup_table (m_lookup_table);
         show_lookup_table ();
@@ -712,10 +715,6 @@ HangulInstance::trigger_property (const String &property)
 	toggle_hangul_mode();
     } else if (property == SCIM_PROP_HANJA_MODE) {
 	toggle_hanja_mode();
-    } else if (property.compare(0, strlen(SCIM_PROP_LAYOUT), SCIM_PROP_LAYOUT) == 0) {
-	int pos = strlen(SCIM_PROP_LAYOUT) + 1;
-	int len = property.length() - pos;
-	change_keyboard_layout(property.substr(pos, len));
     }
 }
 
@@ -726,7 +725,7 @@ HangulInstance::get_candidate_string()
     if (m_surrounding_text.empty())
 	get_surrounding_text(m_surrounding_text, cursor, 10, 0);
 
-    int i; 
+    int i;
     for (i = m_surrounding_text.length() - 1; i >= 0; i--) {
 	if (!hangul_is_syllable(m_surrounding_text[i]))
 	    break;
@@ -768,8 +767,8 @@ HangulInstance::update_candidates ()
 						    str.c_str());
 	    }
 	}
-    } 
-    
+    }
+
     if (list != NULL) {
 	int n = hanja_list_get_size(list);
 	for (int i = 0; i < n; ++i) {
@@ -845,7 +844,7 @@ HangulInstance::hangul_update_preedit_string ()
 bool
 HangulInstance::match_key_event (const KeyEventList &keys, const KeyEvent &key) const
 {
-    KeyEventList::const_iterator kit; 
+    KeyEventList::const_iterator kit;
 
     for (kit = keys.begin (); kit != keys.end (); ++kit) {
 	if (!key.is_key_release()) {
@@ -883,9 +882,9 @@ HangulInstance::toggle_hanja_mode()
     m_factory->m_hanja_mode = !m_factory->m_hanja_mode;
 
     if (m_factory->m_hanja_mode) {
-	hanja_mode.set_label("漢");
+	hanja_mode.set_icon(SCIM_HANGUL_ICON_ON);
     } else {
-	hanja_mode.set_label("韓");
+	hanja_mode.set_icon(SCIM_HANGUL_ICON_OFF);
     }
 
     update_property(hanja_mode);
@@ -894,60 +893,9 @@ HangulInstance::toggle_hanja_mode()
 }
 
 void
-HangulInstance::change_keyboard_layout(const String &layout)
-{
-    String label;
-    if (layout == "2") {
-	label = keyboard_layout_2.get_label();
-    } else if (layout == "32") {
-	label = keyboard_layout_32.get_label();
-    } else if (layout == "3f") {
-	label = keyboard_layout_3f.get_label();
-    } else if (layout == "39") {
-	label = keyboard_layout_39.get_label();
-    } else if (layout == "3s") {
-	label = keyboard_layout_3s.get_label();
-    } else if (layout == "3y") {
-	label = keyboard_layout_3y.get_label();
-    }
-
-    m_factory->m_keyboard_layout = layout;
-    keyboard_layout.set_label(label);
-    hangul_ic_select_keyboard(m_hic, m_factory->m_keyboard_layout.c_str());
-
-    update_property(keyboard_layout);
-
-    m_factory->m_config->write(String(SCIM_CONFIG_LAYOUT), layout);
-}
-
-void
 HangulInstance::register_all_properties()
 {
     PropertyList proplist;
-
-    const char* layout_label = NULL;
-    if (m_factory->m_keyboard_layout == "2") {
-	layout_label = _("2bul");
-    } else if (m_factory->m_keyboard_layout == "32") {
-	layout_label = _("3bul 2bul-shifted");
-    } else if (m_factory->m_keyboard_layout == "3f") {
-	layout_label = _("3bul Final");
-    } else if (m_factory->m_keyboard_layout == "39") {
-	layout_label = _("3bul 390");
-    } else if (m_factory->m_keyboard_layout == "3s") {
-	layout_label = _("3bul No-Shift");
-    } else if (m_factory->m_keyboard_layout == "3y") {
-	layout_label = _("3bul Yetgeul");
-    }
-    if (layout_label)
-        keyboard_layout.set_label(layout_label);
-    proplist.push_back(keyboard_layout);
-    proplist.push_back(keyboard_layout_2);
-    proplist.push_back(keyboard_layout_32);
-    proplist.push_back(keyboard_layout_3f);
-    proplist.push_back(keyboard_layout_39);
-    proplist.push_back(keyboard_layout_3s);
-    proplist.push_back(keyboard_layout_3y);
 
     if (use_ascii_mode()) {
 	if (m_hangul_mode) {
@@ -958,11 +906,12 @@ HangulInstance::register_all_properties()
 	proplist.push_back(hangul_mode);
     }
 
-    if (is_hanja_mode()) {
-	hanja_mode.set_label("漢");
+    if (m_factory->m_hanja_mode) {
+	hanja_mode.set_icon(SCIM_HANGUL_ICON_ON);
     } else {
-	hanja_mode.set_label("韓");
+	hanja_mode.set_icon(SCIM_HANGUL_ICON_OFF);
     }
+    hanja_mode.set_label(_("Hanja Lock"));
     proplist.push_back(hanja_mode);
 
     register_properties(proplist);
