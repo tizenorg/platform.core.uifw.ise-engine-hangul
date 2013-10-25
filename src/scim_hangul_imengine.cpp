@@ -137,7 +137,11 @@ HangulFactory::HangulFactory (const ConfigPointer &config)
     m_hanja_table = hanja_table_load(NULL);
     m_symbol_table = NULL;
 
-    std::string symbol_file = getenv("HOME");
+    const char *env_string = getenv("HOME");
+    std::string symbol_file;
+    if (env_string)
+        symbol_file = env_string;
+
     symbol_file += "/.scim/hangul/symbol.txt";
     if (access(symbol_file.c_str(), R_OK) == 0)
 	m_symbol_table = hanja_table_load(symbol_file.c_str());
