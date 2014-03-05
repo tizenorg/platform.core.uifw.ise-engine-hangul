@@ -1,7 +1,7 @@
 Name:       ise-engine-hangul
 Summary:    Hangul Input Method Engine for ISF
 Version:    0.4.0
-Release:    3
+Release:    4
 Group:      System Environment/Libraries
 License:    GPL
 Source0:    %{name}-%{version}.tar.gz
