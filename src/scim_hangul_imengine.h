@@ -54,8 +54,6 @@ class HangulFactory : public IMEngineFactoryBase
 
     String                   m_keyboard_layout;
 
-    bool                     m_always_use_jamo;
-
     bool                     m_show_candidate_comment;
     bool                     m_lookup_table_vertical;
     bool                     m_use_ascii_mode;
