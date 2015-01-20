@@ -49,6 +49,9 @@ CLEANFILES		= *.bak src/*.bak
 ## @end 1
 ACLOCAL			= aclocal -I $(ac_aux_dir)
 
+pkgdir	= $(SCIM_PKGDIR)
+pkg_DATA	= hangul.xml
+
 ## @start 2
 ## docdir			= $(top_builddir)/doc
 

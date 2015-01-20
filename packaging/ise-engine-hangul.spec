@@ -37,6 +37,7 @@ install -m0644 %{_builddir}/%{buildsubdir}/COPYING %{buildroot}%{_datadir}/licen
 %{_datadir}/scim/icons/*
 %{_datadir}/scim/hangul/symbol.txt
 %{_datadir}/locale/*/LC_MESSAGES/*
+%{_datadir}/packages/*
 %{_libdir}/scim-1.0/1.4.0/IMEngine/hangul.so
 %{_datadir}/license/%{name}
 
