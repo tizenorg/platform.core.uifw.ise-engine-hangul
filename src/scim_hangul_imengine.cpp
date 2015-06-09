@@ -125,7 +125,7 @@ extern "C" {
 
 HangulFactory::HangulFactory (const ConfigPointer &config)
 {
-    m_uuid = "d75857a5-4148-4745-89e2-1da7ddaf70a9";
+    m_uuid = "org.tizen.ise-engine-hangul";
     m_name = _("Korean");
     m_config = config;
     m_keyboard_layout = "2";
