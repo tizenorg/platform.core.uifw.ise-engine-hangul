@@ -1,13 +1,13 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(scim-hangul, 0.4.0, choe.hwanjing@gmail.com) #do not forget to update skim/configure.in.in
+AC_INIT(scim-hangul, 1.0.0, choe.hwanjing@gmail.com) #do not forget to update skim/configure.in.in
 AC_CONFIG_SRCDIR([src/scim_hangul_imengine.h])
 
 # Save this value here, since automake will set cflags and cxxflags later
 cflags_set=${CFLAGS+set}
 cppflags_set=${CPPFLAGS+set}
 
-SCIM_HANGUL_MAJOR_VERSION=0
-SCIM_HANGUL_MINOR_VERSION=4
+SCIM_HANGUL_MAJOR_VERSION=1
+SCIM_HANGUL_MINOR_VERSION=0
 SCIM_HANGUL_MICRO_VERSION=0
 
 SCIM_HANGUL_VERSION=$SCIM_HANGUL_MAJOR_VERSION.$SCIM_HANGUL_MINOR_VERSION.$SCIM_HANGUL_MICRO_VERSION
