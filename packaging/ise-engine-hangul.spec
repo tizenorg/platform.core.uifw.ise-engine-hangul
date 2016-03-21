@@ -19,6 +19,9 @@ characters from the keyboard using the plugin modules and the data files.
 %setup -q
 
 %build
+export CFLAGS+=" -fvisibility=hidden -flto "
+export CXXFLAGS+=" -fvisibility=hidden -flto "
+export CPPFLAGS+=" -DEXPORTED=__attribute__\(\(visibility\(\\\"default\\\"\)\)\)"
 
 ./bootstrap
 %configure --prefix=%{_prefix} --disable-static

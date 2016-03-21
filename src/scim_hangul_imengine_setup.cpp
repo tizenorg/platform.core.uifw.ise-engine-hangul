@@ -86,17 +86,17 @@ static bool        query_changed ();
 
 // Module Interface.
 extern "C" {
-    void scim_module_init (void)
+    EXPORTED void scim_module_init (void)
     {
         bindtextdomain (GETTEXT_PACKAGE, SCIM_HANGUL_LOCALEDIR);
         bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     }
 
-    void scim_module_exit (void)
+    EXPORTED void scim_module_exit (void)
     {
     }
 
-    GtkWidget * scim_setup_module_create_ui (void)
+    EXPORTED GtkWidget * scim_setup_module_create_ui (void)
     {
         static GtkWidget *setup_ui = NULL;
         if (setup_ui == NULL)
@@ -104,32 +104,32 @@ extern "C" {
         return setup_ui;
     }
 
-    String scim_setup_module_get_category (void)
+    EXPORTED String scim_setup_module_get_category (void)
     {
         return String ("IMEngine");
     }
 
-    String scim_setup_module_get_name (void)
+    EXPORTED String scim_setup_module_get_name (void)
     {
         return String (_("Hangul"));
     }
 
-    String scim_setup_module_get_description (void)
+    EXPORTED String scim_setup_module_get_description (void)
     {
         return String (_("A Hangul IMEngine Module."));
     }
 
-    void scim_setup_module_load_config (const ConfigPointer &config)
+    EXPORTED void scim_setup_module_load_config (const ConfigPointer &config)
     {
         load_config (config);
     }
 
-    void scim_setup_module_save_config (const ConfigPointer &config)
+    EXPORTED void scim_setup_module_save_config (const ConfigPointer &config)
     {
         save_config (config);
     }
 
-    bool scim_setup_module_query_changed ()
+    EXPORTED bool scim_setup_module_query_changed ()
     {
         return query_changed ();
     }

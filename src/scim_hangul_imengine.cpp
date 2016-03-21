@@ -88,18 +88,18 @@ static Property hangul_mode(SCIM_PROP_HANGUL_MODE, "");
 static Property hanja_mode(SCIM_PROP_HANJA_MODE, "");
 
 extern "C" {
-    void scim_module_init (void)
+    EXPORTED void scim_module_init (void)
     {
         bindtextdomain (GETTEXT_PACKAGE, SCIM_HANGUL_LOCALEDIR);
         bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     }
 
-    void scim_module_exit (void)
+    EXPORTED void scim_module_exit (void)
     {
         _scim_config.reset ();
     }
 
-    uint32 scim_imengine_module_init (const ConfigPointer &config)
+    EXPORTED uint32 scim_imengine_module_init (const ConfigPointer &config)
     {
         SCIM_DEBUG_IMENGINE(1) << "Initialize Hangul Engine\n";
 
@@ -108,7 +108,7 @@ extern "C" {
         return 1;
     }
 
-    IMEngineFactoryPointer scim_imengine_module_create_factory (uint32 engine)
+    EXPORTED IMEngineFactoryPointer scim_imengine_module_create_factory (uint32 engine)
     {
         HangulFactory *factory = 0;
 
