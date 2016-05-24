@@ -645,7 +645,16 @@ void
 HangulInstance::reset()
 {
     SCIM_DEBUG_IMENGINE(2) << "reset.\n";
-    flush();
+
+    hide_preedit_string();
+
+    WideString wstr = m_preedit;
+    const ucschar *str = hangul_ic_flush(m_hic);
+    while (*str != 0)
+        wstr.push_back (*str++);
+
+    delete_candidates ();
+    m_preedit.clear();
 }
 
 void
