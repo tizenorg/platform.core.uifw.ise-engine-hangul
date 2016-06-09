@@ -19,8 +19,8 @@ characters from the keyboard using the plugin modules and the data files.
 %setup -q
 
 %build
-export CFLAGS+=" -fvisibility=hidden -flto "
-export CXXFLAGS+=" -fvisibility=hidden -flto "
+export CFLAGS+=" -fvisibility=hidden "
+export CXXFLAGS+=" -fvisibility=hidden "
 export CPPFLAGS+=" -DEXPORTED=__attribute__\(\(visibility\(\\\"default\\\"\)\)\)"
 
 ./bootstrap
